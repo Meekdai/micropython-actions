@@ -16,7 +16,7 @@ jobs:
         git pull origin master
 
     - name: Install packages
-      run: /opt/micropython/tools/ci.sh && ci_stm32_setup
+      run: source /opt/micropython/tools/ci.sh && ci_stm32_setup
 
     - name: Bulid
       run: |
