@@ -1,4 +1,4 @@
-name: build-stm32f405
+name: build-stm32
 
 on:
   workflow_dispatch:
@@ -11,6 +11,11 @@ on:
         description: 'board'
         required: true
         default: 'PYBV10'
+
+      build-with:
+        description: 'build-with'
+        required: false
+        default: ''
 
 jobs:
   build:
@@ -33,14 +38,14 @@ jobs:
         make -C mpy-cross
         make -C ports/stm32 submodules
         git submodule update --init lib/btstack
-        make -C ports/stm32 BOARD=${{ github.event.inputs.board }}
+        make -C ports/stm32 BOARD=${{ github.event.inputs.board }} ${{ github.event.inputs.build-with }}
         cp ports/stm32/build-${{ github.event.inputs.board }}/firmware.dfu /opt/firmware
         cp ports/stm32/build-${{ github.event.inputs.board }}/firmware.hex /opt/firmware
         cp ports/stm32/build-${{ github.event.inputs.board }}/firmware0.bin /opt/firmware
         cp ports/stm32/build-${{ github.event.inputs.board }}/firmware1.bin /opt/firmware
 
-    - name : Upload firmware-stm32f405-${{ github.event.inputs.board }}
+    - name : Upload firmware-stm32-${{ github.event.inputs.board }}
       uses: actions/upload-artifact@master
       with:
-        name: firmware-stm32f405-${{ github.event.inputs.board }}
+        name: firmware-stm32-${{ github.event.inputs.board }}
         path: /opt/firmware
