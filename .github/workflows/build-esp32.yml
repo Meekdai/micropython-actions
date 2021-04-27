@@ -43,12 +43,12 @@ jobs:
 
     - name: Bulid
       run: |
+        source ./esp-idf/export.sh
         mkdir /opt/firmware
         cd /opt/micropython
         git checkout ${{github.event.inputs.branches-tags}}
         git pull origin ${{github.event.inputs.branches-tags}}
         git submodule update --init
-        source esp-idf/export.sh
         make -C mpy-cross
         make -C ports/esp32 submodules
         cp -r /home/runner/work/micropython-actions/micropython-actions/boards/${{github.event.inputs.custom-board}} ports/esp32/boards
