@@ -49,8 +49,8 @@ jobs:
         cp ports/stm32/build-${{github.event.inputs.board}}/firmware0.bin /opt/firmware
         cp ports/stm32/build-${{github.event.inputs.board}}/firmware1.bin /opt/firmware
 
-    - name : Upload firmware-stm32-${{github.event.inputs.board}}
+    - name : Upload firmware-${{github.event.inputs.branches-tags}}-stm32-${{github.event.inputs.board}}
       uses: actions/upload-artifact@master
       with:
-        name: firmware-stm32-${{github.event.inputs.board}}
+        name: firmware-${{github.event.inputs.branches-tags}}-stm32-${{github.event.inputs.board}}
         path: /opt/firmware
