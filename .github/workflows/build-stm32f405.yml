@@ -1,4 +1,4 @@
-name: build-stm32f405-PYBV10
+name: build-stm32f405
 
 on:
   workflow_dispatch:
