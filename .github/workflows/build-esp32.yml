@@ -1,0 +1,64 @@
+name: build-esp32
+
+on:
+  workflow_dispatch:
+    inputs:
+      git-address:
+        description: 'git-address'
+        required: true
+        default: 'https://github.com/micropython/micropython.git'
+      branches-tags:
+        description: 'branches-tags'
+        required: true
+        default: 'master'
+      board:
+        description: 'board'
+        required: true
+        default: 'PYBV10'
+      idf-version:
+        description: 'idf-version'
+        required: true
+        default: 'v4.3-beta2'
+      custom-board:
+        description: 'custom-board'
+        required: false
+        default: ''
+      build-with:
+        description: 'build-with'
+        required: false
+        default: ''
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v2
+    - name: Clone source code
+      run: |
+        git clone ${{github.event.inputs.git-address}} /opt/micropython
+        cd /opt/micropython
+
+    - name: Install packages
+      run: source tools/ci.sh && ci_esp32_setup_helper ${{github.event.inputs.idf-version}}
+
+    - name: Bulid
+      run: |
+        mkdir /opt/firmware
+        cd /opt/micropython
+        git checkout ${{github.event.inputs.branches-tags}}
+        git pull origin ${{github.event.inputs.branches-tags}}
+        git submodule update --init
+        source esp-idf/export.sh
+        make -C mpy-cross
+        make -C ports/esp32 submodules
+        cp -r /home/runner/work/micropython-actions/micropython-actions/boards/${{github.event.inputs.custom-board}} ports/esp32/boards
+        make -C ports/esp32 BOARD=${{github.event.inputs.board}} ${{github.event.inputs.build-with}}
+        cp ports/esp32/build-${{github.event.inputs.board}}/firmware.bin /opt/firmware
+        cp ports/esp32/build-${{github.event.inputs.board}}/micropython.bin /opt/firmware
+        cp ports/esp32/build-${{github.event.inputs.board}}/bootloader/bootloader.bin /opt/firmware
+
+    - name : Upload firmware-${{github.event.inputs.branches-tags}}-esp32-${{github.event.inputs.board}}
+      uses: actions/upload-artifact@master
+      with:
+        name: firmware-${{github.event.inputs.branches-tags}}-esp32-${{github.event.inputs.board}}
+        path: /opt/firmware
