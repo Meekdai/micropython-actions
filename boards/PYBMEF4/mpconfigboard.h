@@ -3,7 +3,6 @@
 
 #define MICROPY_HW_HAS_SWITCH       (1)
 #define MICROPY_HW_HAS_FLASH        (1)
-#define MICROPY_HW_HAS_SDCARD       (0)
 #define MICROPY_HW_HAS_MMA7660      (0)
 #define MICROPY_HW_HAS_LCD          (1)
 #define MICROPY_HW_ENABLE_RNG       (1)
@@ -11,6 +10,7 @@
 #define MICROPY_HW_ENABLE_SERVO     (1)
 #define MICROPY_HW_ENABLE_DAC       (1)
 #define MICROPY_HW_ENABLE_USB       (1)
+#define MICROPY_HW_ENABLE_SDCARD    (0)
 
 // HSE is 8MHz
 #define MICROPY_HW_CLK_PLLM (8)
@@ -98,15 +98,8 @@
 #define MICROPY_HW_USB_VBUS_DETECT_PIN (pin_A9)
 #define MICROPY_HW_USB_OTG_ID_PIN      (pin_A10)
 
-#define MICROPY_PY_THREAD           (1)
-// #define MICROPY_PY_THREAD_GIL       (1)
-
-// #define MICROPY_PY_LWIP (1)
-// #define MICROPY_PY_UWEBSOCKET (1)
-// #define MICROPY_PY_WEBREPL (1)
-// #define MICROPY_PY_USOCKET_EVENTS (MICROPY_PY_WEBREPL)
-// #define MICROPY_PY_UHASHLIB_SHA1            (1)
-// #define MICROPY_ME_SHA1                     (1)
+// MMA accelerometer config
+// #define MICROPY_HW_MMA_AVDD_PIN     (pin_B5)
 
 // Bootloader configuration (only needed if Mboot is used)
 #define MBOOT_FSLOAD (1)
@@ -118,6 +111,7 @@
 #define MBOOT_SPIFLASH_CONFIG (&spiflash_config)
 
 // use external SPI flash for storage
+#define MICROPY_HW_SPIFLASH_ENABLE_CACHE (1)
 #define MICROPY_HW_ENABLE_INTERNAL_FLASH_STORAGE (0)
 #define MICROPY_HW_SPIFLASH_SIZE_BITS (128 * 1024 * 1024)
 #define MICROPY_HW_SPIFLASH_CS      (pin_B5)

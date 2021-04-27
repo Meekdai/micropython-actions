@@ -11,5 +11,6 @@ LD_FILES = boards/stm32f405.ld boards/common_ifs.ld
 TEXT0_ADDR = 0x08000000
 TEXT1_ADDR = 0x08020000
 endif
-MICROPY_PY_WIZNET5K = 5500
-# MICROPY_PY_LWIP = 1
+
+# MicroPython settings
+# MICROPY_VFS_LFS2 = 1
