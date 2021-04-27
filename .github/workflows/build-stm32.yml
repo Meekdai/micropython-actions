@@ -7,11 +7,14 @@ on:
         description: 'git-address'
         required: true
         default: 'https://github.com/micropython/micropython.git'
+      branches-tags:
+        description: 'branches-tags'
+        required: true
+        default: 'master'
       board:
         description: 'board'
         required: true
         default: 'PYBV10'
-
       build-with:
         description: 'build-with'
         required: false
@@ -24,7 +27,7 @@ jobs:
     - uses: actions/checkout@v2
     - name: Clone source code
       run: |
-        git clone ${{ github.event.inputs.git-address }} /opt/micropython
+        git clone ${{github.event.inputs.git-address}} /opt/micropython
         cd /opt/micropython
 
     - name: Install packages
@@ -34,18 +37,20 @@ jobs:
       run: |
         mkdir /opt/firmware
         cd /opt/micropython
+        git checkout ${{github.event.inputs.branches-tags}}
+        git pull origin ${{github.event.inputs.branches-tags}}
         git submodule update --init
         make -C mpy-cross
         make -C ports/stm32 submodules
         git submodule update --init lib/btstack
-        make -C ports/stm32 BOARD=${{ github.event.inputs.board }} ${{ github.event.inputs.build-with }}
-        cp ports/stm32/build-${{ github.event.inputs.board }}/firmware.dfu /opt/firmware
-        cp ports/stm32/build-${{ github.event.inputs.board }}/firmware.hex /opt/firmware
-        cp ports/stm32/build-${{ github.event.inputs.board }}/firmware0.bin /opt/firmware
-        cp ports/stm32/build-${{ github.event.inputs.board }}/firmware1.bin /opt/firmware
+        make -C ports/stm32 BOARD=${{github.event.inputs.board}} ${{github.event.inputs.build-with}}
+        cp ports/stm32/build-${{github.event.inputs.board}}/firmware.dfu /opt/firmware
+        cp ports/stm32/build-${{github.event.inputs.board}}/firmware.hex /opt/firmware
+        cp ports/stm32/build-${{github.event.inputs.board}}/firmware0.bin /opt/firmware
+        cp ports/stm32/build-${{github.event.inputs.board}}/firmware1.bin /opt/firmware
 
-    - name : Upload firmware-stm32-${{ github.event.inputs.board }}
+    - name : Upload firmware-stm32-${{github.event.inputs.board}}
       uses: actions/upload-artifact@master
       with:
-        name: firmware-stm32-${{ github.event.inputs.board }}
+        name: firmware-stm32-${{github.event.inputs.board}}
         path: /opt/firmware
