@@ -12,6 +12,12 @@ jobs:
       run: |
         git clone https://github.com/micropython/micropython.git /opt/micropython
         cd /opt/micropython
+        
+    - name: Install packages
+      run: tools/ci.sh && ci_stm32_setup
+
+    - name: Bulid
+      run: |
         git submodule update --init
         make -C mpy-cross
         make -C ports/stm32 submodules
