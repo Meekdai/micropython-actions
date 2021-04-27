@@ -19,10 +19,6 @@ on:
         description: 'build-with'
         required: false
         default: 'MICROPY_PY_WIZNET5K=5500'
-      cmodule:
-        description: 'cmodule'
-        required: false
-        default: 'MICROPY_PY_WIZNET5K=5500'
 
 jobs:
   build:
