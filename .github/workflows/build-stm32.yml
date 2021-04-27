@@ -43,7 +43,7 @@ jobs:
         make -C mpy-cross
         make -C ports/stm32 submodules
         git submodule update --init lib/btstack
-        make -C ports/stm32 BOARD=${{github.event.inputs.board}} ${{github.event.inputs.build-with}} USER_C_MODULES=/home/runner/work/micropython-actions/cmodule all
+        make -C ports/stm32 BOARD=${{github.event.inputs.board}} ${{github.event.inputs.build-with}} USER_C_MODULES=/home/runner/work/micropython-actions/micropython-actions/cmodule all
         cp ports/stm32/build-${{github.event.inputs.board}}/firmware.dfu /opt/firmware
         cp ports/stm32/build-${{github.event.inputs.board}}/firmware.hex /opt/firmware
         cp ports/stm32/build-${{github.event.inputs.board}}/firmware0.bin /opt/firmware
