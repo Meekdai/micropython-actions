@@ -14,7 +14,7 @@ on:
       board:
         description: 'board'
         required: true
-        default: 'PYBV10'
+        default: 'GENERIC'
       idf-version:
         description: 'idf-version'
         required: true
@@ -39,7 +39,7 @@ jobs:
         cd /opt/micropython
 
     - name: Install packages
-      run: source tools/ci.sh && ci_esp32_setup_helper ${{github.event.inputs.idf-version}}
+      run: source /opt/micropython/tools/ci.sh && ci_esp32_setup_helper ${{github.event.inputs.idf-version}}
 
     - name: Bulid
       run: |
