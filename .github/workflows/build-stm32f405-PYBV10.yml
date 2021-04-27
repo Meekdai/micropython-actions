@@ -25,7 +25,7 @@ jobs:
         make -C mpy-cross
         make -C ports/stm32 submodules
         git submodule update --init lib/btstack
-        make -C ports/stm32/mboot BOARD=PYBV10
+        make -C ports/stm32 BOARD=PYBV10
 
     - name : Upload firmware-stm32f405-PYBV10
       uses: actions/upload-artifact@master
