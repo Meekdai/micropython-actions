@@ -7,6 +7,10 @@ on:
         description: 'git-address'
         required: true
         default: 'https://github.com/micropython/micropython.git'
+      board:
+        description: 'board'
+        required: true
+        default: 'PYBV10'
 
 jobs:
   build:
@@ -29,14 +33,14 @@ jobs:
         make -C mpy-cross
         make -C ports/stm32 submodules
         git submodule update --init lib/btstack
-        make -C ports/stm32 BOARD=PYBV10
-        cp ports/stm32/build-PYBV10/firmware.dfu /opt/firmware
-        cp ports/stm32/build-PYBV10/firmware.hex /opt/firmware
-        cp ports/stm32/build-PYBV10/firmware0.bin /opt/firmware
-        cp ports/stm32/build-PYBV10/firmware1.bin /opt/firmware
+        make -C ports/stm32 BOARD=${{ github.event.inputs.board }}
+        cp ports/stm32/build-${{ github.event.inputs.board }}/firmware.dfu /opt/firmware
+        cp ports/stm32/build-${{ github.event.inputs.board }}/firmware.hex /opt/firmware
+        cp ports/stm32/build-${{ github.event.inputs.board }}/firmware0.bin /opt/firmware
+        cp ports/stm32/build-${{ github.event.inputs.board }}/firmware1.bin /opt/firmware
 
-    - name : Upload firmware-stm32f405-PYBV10
+    - name : Upload firmware-stm32f405-${{ github.event.inputs.board }}
       uses: actions/upload-artifact@master
       with:
-        name: firmware-stm32f405-PYBV10
+        name: firmware-stm32f405-${{ github.event.inputs.board }}
         path: /opt/firmware
