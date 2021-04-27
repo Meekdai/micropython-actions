@@ -1,4 +1,6 @@
 #include "storage.h"
+#include "qspi.h"
+#include "py/mphal.h"
 
 // External SPI flash uses standard SPI interface
 
@@ -11,14 +13,16 @@ STATIC const mp_soft_spi_obj_t soft_spi_bus = {
     .miso = MICROPY_HW_SPIFLASH_MISO,
 };
 
-STATIC mp_spiflash_cache_t spi_bdev_cache;
+// STATIC mp_spiflash_cache_t spi_bdev_cache;
+char _ffs_cache;
 
 const mp_spiflash_config_t spiflash_config = {
     .bus_kind = MP_SPIFLASH_BUS_SPI,
     .bus.u_spi.cs = MICROPY_HW_SPIFLASH_CS,
     .bus.u_spi.data = (void*)&soft_spi_bus,
     .bus.u_spi.proto = &mp_soft_spi_proto,
-    .cache = &spi_bdev_cache,
+    // .cache = &spi_bdev_cache,
+    .cache = (mp_spiflash_cache_t *) &_ffs_cache,
 };
 
 spi_bdev_t spi_bdev;
