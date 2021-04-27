@@ -18,7 +18,11 @@ on:
       build-with:
         description: 'build-with'
         required: false
-        default: ''
+        default: 'MICROPY_PY_WIZNET5K=5500'
+      cmodule:
+        description: 'cmodule'
+        required: false
+        default: 'MICROPY_PY_WIZNET5K=5500'
 
 jobs:
   build:
@@ -43,7 +47,7 @@ jobs:
         make -C mpy-cross
         make -C ports/stm32 submodules
         git submodule update --init lib/btstack
-        make -C ports/stm32 BOARD=${{github.event.inputs.board}} ${{github.event.inputs.build-with}}
+        make -C ports/stm32 BOARD=${{github.event.inputs.board}} ${{github.event.inputs.build-with}} USER_C_MODULES=/cmodule all
         cp ports/stm32/build-${{github.event.inputs.board}}/firmware.dfu /opt/firmware
         cp ports/stm32/build-${{github.event.inputs.board}}/firmware.hex /opt/firmware
         cp ports/stm32/build-${{github.event.inputs.board}}/firmware0.bin /opt/firmware
