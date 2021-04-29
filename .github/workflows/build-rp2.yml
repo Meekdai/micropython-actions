@@ -1,0 +1,57 @@
+name: build-rp2
+
+on:
+  workflow_dispatch:
+    inputs:
+      git-address:
+        description: 'git-address'
+        required: true
+        default: 'https://github.com/micropython/micropython.git'
+      branches-tags:
+        description: 'branches-tags'
+        required: true
+        default: 'master'
+      board:
+        description: 'board'
+        required: true
+        default: 'PICO'
+      custom-board:
+        description: 'custom-board'
+        required: false
+        default: ''
+      build-with:
+        description: 'build-with'
+        required: false
+        default: ''
+
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v2
+    - name: Clone source code
+      run: |
+        git clone ${{github.event.inputs.git-address}} /opt/micropython
+        cd /opt/micropython
+
+    - name: Install packages
+      run: source /opt/micropython/tools/ci.sh && ci_rp2_setup
+
+    - name: Bulid
+      run: |
+        mkdir /opt/firmware
+        cd /opt/micropython
+        git checkout ${{github.event.inputs.branches-tags}}
+        git pull origin ${{github.event.inputs.branches-tags}}
+        make -C mpy-cross
+        git submodule update --init lib/pico-sdk lib/tinyusb
+        cp -r /home/runner/work/micropython-actions/micropython-actions/boards/${{github.event.inputs.custom-board}} ports/rp2/boards
+        make -C ports/rp2 BOARD=${{github.event.inputs.board}} ${{github.event.inputs.build-with}}
+        cp ports/rp2/build-${{github.event.inputs.board}}/firmware.bin /opt/firmware
+
+    - name : Upload firmware-${{github.event.inputs.branches-tags}}-rp2-${{github.event.inputs.board}}
+      uses: actions/upload-artifact@master
+      with:
+        name: firmware-${{github.event.inputs.branches-tags}}-rp2-${{github.event.inputs.board}}
+        path: /opt/firmware
