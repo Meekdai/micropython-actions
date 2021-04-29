@@ -46,7 +46,7 @@ jobs:
         git pull origin ${{github.event.inputs.branches-tags}}
         git submodule update --init
         make -C mpy-cross
-        tagDate=git show -s --format="%ct"
+        tagDate= git show -s --format="%ct"
         if [ $tagDate >= 1571130881]; then make -C ports/stm32 submodules; fi # commit f562f94
         if [ $tagDate >= 1583776422]; then git submodule update --init lib/btstack; fi # commit ecee6f2
         cp -r /home/runner/work/micropython-actions/micropython-actions/boards/${{github.event.inputs.custom-board}} ports/stm32/boards
