@@ -48,7 +48,9 @@ jobs:
         git submodule update --init lib/pico-sdk lib/tinyusb
         cp -r /home/runner/work/micropython-actions/micropython-actions/boards/${{github.event.inputs.custom-board}} ports/rp2/boards
         make -C ports/rp2 BOARD=${{github.event.inputs.board}} ${{github.event.inputs.build-with}}
-        find ports/rp2/build-${{github.event.inputs.board}}/ -mindepth 1 -maxdepth 2 -type f -name "*.bin" -print | cpio -pdm /opt/firmware
+        cp ports/rp2/build-${{github.event.inputs.board}}/firmware.bin /opt/firmware
+        cp ports/rp2/build-${{github.event.inputs.board}}/firmware.uf2 /opt/firmware
+        cp ports/rp2/build-${{github.event.inputs.board}}/micropython.uf2 /opt/firmware
 
     - name : Upload firmware-${{github.event.inputs.branches-tags}}-rp2-${{github.event.inputs.board}}
       uses: actions/upload-artifact@master
