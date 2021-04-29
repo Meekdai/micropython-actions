@@ -50,7 +50,6 @@ jobs:
         make -C ports/rp2 BOARD=${{github.event.inputs.board}} ${{github.event.inputs.build-with}}
         cp ports/rp2/build-${{github.event.inputs.board}}/firmware.bin /opt/firmware
         cp ports/rp2/build-${{github.event.inputs.board}}/firmware.uf2 /opt/firmware
-        cp ports/rp2/build-${{github.event.inputs.board}}/micropython.uf2 /opt/firmware
 
     - name : Upload firmware-${{github.event.inputs.branches-tags}}-rp2-${{github.event.inputs.board}}
       uses: actions/upload-artifact@master
