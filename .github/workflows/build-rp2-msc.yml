@@ -1,0 +1,59 @@
+name: build-rp2-msc
+
+on:
+  workflow_dispatch:
+    inputs:
+      git-address:
+        description: 'git-address'
+        required: true
+        default: 'https://github.com/micropython/micropython.git'
+      branches-tags:
+        description: 'branches-tags'
+        required: true
+        default: 'v1.17'
+      board:
+        description: 'board'
+        required: true
+        default: 'PICO-MSC'
+      custom-board:
+        description: 'custom-board'
+        required: false
+        default: 'PICO-MSC'
+      build-with:
+        description: 'build-with'
+        required: false
+        default: ''
+
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v2
+    - name: Clone source code
+      run: |
+        git clone ${{github.event.inputs.git-address}} /opt/micropython
+        cd /opt/micropython
+
+    - name: Install packages
+      run: source /opt/micropython/tools/ci.sh && ci_rp2_setup
+
+    - name: Bulid
+      run: |
+        mkdir /opt/firmware
+        cd /opt/micropython
+        git checkout ${{github.event.inputs.branches-tags}}
+        git pull origin ${{github.event.inputs.branches-tags}}
+        make -C mpy-cross
+        git submodule update --init lib/pico-sdk lib/tinyusb
+        cp -rf /home/runner/work/micropython-actions/micropython-actions/rp2-msc ports/rp2
+        cp -r /home/runner/work/micropython-actions/micropython-actions/boards/${{github.event.inputs.custom-board}} ports/rp2/boards
+        make -C ports/rp2 BOARD=${{github.event.inputs.board}} ${{github.event.inputs.build-with}}
+        cp ports/rp2/build-${{github.event.inputs.board}}/firmware.bin /opt/firmware
+        cp ports/rp2/build-${{github.event.inputs.board}}/firmware.uf2 /opt/firmware
+
+    - name : Upload firmware-${{github.event.inputs.branches-tags}}-rp2-${{github.event.inputs.board}}
+      uses: actions/upload-artifact@master
+      with:
+        name: firmware-${{github.event.inputs.branches-tags}}-rp2-${{github.event.inputs.board}}
+        path: /opt/firmware
