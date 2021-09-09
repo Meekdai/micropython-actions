@@ -14,15 +14,15 @@ on:
       board:
         description: 'board'
         required: true
-        default: 'PICO-MSC'
+        default: 'PICO'
       custom-board:
         description: 'custom-board'
         required: false
-        default: 'PICO-MSC'
+        default: ''
       build-with:
         description: 'build-with'
         required: false
-        default: ''
+        default: 'MICROPY_HW_USB_MSC=1'
 
 
 jobs:
@@ -46,7 +46,7 @@ jobs:
         git pull origin ${{github.event.inputs.branches-tags}}
         make -C mpy-cross
         git submodule update --init lib/pico-sdk lib/tinyusb
-        cp -rf /home/runner/work/micropython-actions/micropython-actions/rp2-msc ports/rp2
+        cp -rf /home/runner/work/micropython-actions/micropython-actions/rp2-msc/. ports/rp2
         cp -r /home/runner/work/micropython-actions/micropython-actions/boards/${{github.event.inputs.custom-board}} ports/rp2/boards
         make -C ports/rp2 BOARD=${{github.event.inputs.board}} ${{github.event.inputs.build-with}}
         cp ports/rp2/build-${{github.event.inputs.board}}/firmware.bin /opt/firmware
