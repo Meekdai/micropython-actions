@@ -100,11 +100,12 @@
 #define MICROPY_HW_USB_VBUS_DETECT_PIN (pin_A9)
 #define MICROPY_HW_USB_OTG_ID_PIN      (pin_A10)
 
-#define MICROPY_PY_THREAD           (1)
+// #define MICROPY_PY_THREAD           (1)
 // #define MICROPY_PY_THREAD_GIL       (1)
 
 // #define MICROPY_PY_LWIP (1)
-// #define MICROPY_PY_UWEBSOCKET (1)
+#define MICROPY_PY_USOCKET    (1)
+#define MICROPY_PY_UWEBSOCKET (1)
 // #define MICROPY_PY_WEBREPL (1)
 // #define MICROPY_PY_USOCKET_EVENTS (MICROPY_PY_WEBREPL)
 // #define MICROPY_PY_UHASHLIB_SHA1            (1)
