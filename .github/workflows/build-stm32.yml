@@ -10,19 +10,19 @@ on:
       branches-tags:
         description: 'branches-tags'
         required: true
-        default: 'master'
+        default: 'v1.17'
       board:
         description: 'board'
         required: true
-        default: 'PYBV10'
+        default: 'STEPM'
       custom-board:
         description: 'custom-board'
         required: false
-        default: ''
+        default: 'STEPM'
       build-with:
         description: 'build-with'
         required: false
-        default: 'MICROPY_PY_WIZNET5K=5500'
+        default: 'USER_C_MODULES=/home/runner/work/micropython-actions/micropython-actions/cmodule all'
 
 
 jobs:
