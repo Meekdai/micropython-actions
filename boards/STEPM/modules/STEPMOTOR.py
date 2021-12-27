@@ -118,6 +118,10 @@ class BOARD():
             if data["num"]==1:
                 self.sendBuf["TR"]=data["STR"]
                 self.sendBuf["TV"]=data["STV"]
+                if data["STV"]<0:
+                    self.TMC1.writeReg(0x00,(0<<0) | (0<<1) | (1<<2) | (1<<4))
+                else:
+                    self.TMC1.writeReg(0x00,(0<<0) | (0<<1) | (1<<2) | (0<<4))
             else:
                 data["result"]="ERROR"
                 data["message"]="TMC num ERROR"
