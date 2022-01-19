@@ -1,6 +1,7 @@
 import pyb
 import time
 import uasyncio as asyncio
+import math
 
 _GCONF				=const(0x00) 	#Global configuration flags
 _X_COMPARE 			=const(0x05)	#Position  comparison  register
@@ -27,6 +28,9 @@ _VDCMIN             =const(0x33)
 _SW_MODE 			=const(0x34)	#Switch mode configuration
 _RAMP_STAT			=const(0x35)	#Ramp status and switch event status
 _XLATCH				=const(0x36)	#Latches  XACTUAL  upon  a programmable switch event
+_ENCMODE            =const(0x38)    #编码器配置
+_X_ENC              =const(0x39)    #获取编码器位置
+_ENC_CONST          =const(0x3A)    #设置编码器因子 因子=200*256/编码器一圈脉冲数
 _CHOPCONF			=const(0x6C)	#Chopper and driver configuration
 _COOLCONF			=const(0x6D)	#coolStep smart current control register and stallGuard2 configuration
 _DCCTRL             =const(0x6E)
@@ -35,7 +39,7 @@ _PWMCONF            =const(0x70)
 _VZERO				=const(0x400)		# flag in RAMP_STAT, 1: signals that the actual velocity is 0.
 
 class TMC5130():
-    def __init__(self,spi_num=1,cs_pin=None,direction=0,iHold=4,iRun=15,iHoldDelay=6,amax=65535,stealthChop=1,swL=0,swR=0,swValid=0,ppmm=200*256,microstep=256):
+    def __init__(self,spi_num=1,cs_pin=None,direction=0,iHold=4,iRun=15,iHoldDelay=6,amax=65535,stealthChop=1,swL=0,swR=0,swValid=0,ppmm=200*256,microstep=256,ENC=0):
         self.spi = pyb.SPI(spi_num, pyb.SPI.MASTER,prescaler=256,phase=1,polarity=1)
         self.tmc_cs=cs_pin
         
@@ -90,6 +94,15 @@ class TMC5130():
         self.writeReg(_D_1, amax)
         self.writeReg(_VSTOP, 10) # VSTOP = 10 Stop velocity (Near to zero)
         self.writeReg(_VSTART, 0)
+
+        self.enc=ENC # 编码器一圈脉冲数*倍频数（4）
+        if self.enc!=0:
+            self.writeReg(_ENCMODE, 0x558) # 配置因子小数点为10进制模式(ABZ极性配置也在这里)
+            # self.writeReg(_ENC_CONST, (21<<16)+3333) # 配置因子 600*4
+            a=math.modf(microstep*200/self.enc)
+            self.writeReg(_ENC_CONST, (int(a[1])<<16) + int(a[0]*10000) ) # 配置因子
+            self.writeReg(_X_ENC, 0) # 编码器位置清零
+
 
     def writeReg(self,regaddr,data):
         self.tmc_cs.low()
@@ -151,7 +164,11 @@ class TMC5130():
             self.writeReg(_RAMPMODE, 1) # RAMPMODE = 1 (Target velocity move)
 
     def setVelocity(self,velocity):
-        velocityPP=int(abs(velocity)*self.ppmm)
+        # velocityPP=int(abs(velocity)*self.ppmm)
+        if velocity==0:
+            velocityPP=0
+        else:
+            velocityPP=int(abs(velocity)*self.ppmm/(16000000/2/(1<<23))) # 51200/(16000000/2/(1<<23))
         self.writeReg(_VMAX, velocityPP) # VMAX
 
     def getVelocityStatus(self):
@@ -183,8 +200,15 @@ class TMC5130():
         return self.readReg(_XACTUAL)/self.ppmm
         # return self.to32bit(self.readReg(_XACTUAL))/self.ppmm
 
+    def readENCPosition(self):
+        data=self.readReg(_X_ENC)
+        if data>(2**31-1):
+            return (-((2**31-1)*2-data+2))/self.ppmm
+        else:
+            return data/self.ppmm
+
     def readVelocity(self):
-        return self.readReg(_VACTUAL)/self.ppmm
+        return self.readReg(_VACTUAL)/self.ppmm*(16000000/2/(1<<23))
 
     def home(self,velocity):
         self.isHome=1
