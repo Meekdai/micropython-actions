@@ -269,6 +269,7 @@ class BOARD():
         onePlan=300000 # 一次写入TMC旋转的圈数
         self.isTMCRun=1
         self.fram[0]=20
+
         while self.isTMCRun:
 
             if self.sendBuf["TR"]==self.ENCR:
@@ -278,7 +279,11 @@ class BOARD():
 
             if abs(self.sendBuf["TR"]-self.ENCR)<=onePlan:
                 self.TMC1.setPosition(0)
-                self.TMC1.positionMode(self.sendBuf["TV"],abs(self.sendBuf["TR"]-self.ENCR))
+                if self.ENCR==self.sendBuf["CR"]: #判断是否相等，相等则为断电，否则需要加上小数点
+                    self.TMC1.positionMode(self.sendBuf["TV"],abs(self.sendBuf["TR"]-self.ENCR))
+                else:
+                    self.TMC1.positionMode(self.sendBuf["TV"],abs(self.sendBuf["TR"]-self.sendBuf["CR"]))
+
                 while self.isTMCRun:
                     if self.ENCR!=struct.unpack('>I',self.fram[105:109])[0]:
                         self.writeFramCR()
