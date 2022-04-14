@@ -45,7 +45,7 @@ jobs:
         git checkout ${{github.event.inputs.branches-tags}}
         git pull origin ${{github.event.inputs.branches-tags}}
         make -C mpy-cross
-        git submodule update --init lib/pico-sdk lib/tinyusb
+        git submodule update --init lib/pico-sdk lib/tinyusb lib/mbedtls
         cp -r /home/runner/work/micropython-actions/micropython-actions/boards/${{github.event.inputs.custom-board}} ports/rp2/boards
         make -C ports/rp2 BOARD=${{github.event.inputs.board}} ${{github.event.inputs.build-with}}
         cp ports/rp2/build-${{github.event.inputs.board}}/firmware.bin /opt/firmware
