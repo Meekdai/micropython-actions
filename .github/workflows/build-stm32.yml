@@ -22,7 +22,7 @@ on:
       build-with:
         description: 'build-with'
         required: false
-        default: 'USER_C_MODULES=/home/runner/work/micropython-actions/micropython-actions/cmodule all'
+        default: ''
 
 
 jobs:
